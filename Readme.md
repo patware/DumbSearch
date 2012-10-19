@@ -1,6 +1,6 @@
 DumbSearch: A simple utility for finding files.
 
-Current Version: 1.1
+Current Version: 2.0
 
 History:
 2.0 - 2012.10.18 - New UI, new code, new technologies.
