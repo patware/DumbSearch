@@ -1,0 +1,192 @@
+﻿<Window x:Class="DumbSearch.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ignore="http://www.ignore.com"
+        mc:Ignorable="d ignore"
+        Height="522.981"
+        Width="622.14"
+        Title="{Binding ApplicationTitle}"
+        DataContext="{Binding Main, Source={StaticResource Locator}}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Skins/MainSkin.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            
+            <Style TargetType="TextBox">
+                <!--<Setter Property="Margin" Value="3"/>-->
+            </Style>
+            
+        </ResourceDictionary>
+    </Window.Resources>
+    
+    <Grid x:Name="LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0" Header="Files and Folders" Margin="3" Padding="3">  
+            <StackPanel>
+                <!--<TextBlock HorizontalAlignment="Stretch" Padding="25 3 0 3" FontWeight="Bold">File Name Parameters</TextBlock>-->
+
+                <!-- Root -->
+                <StackPanel Orientation="Horizontal" Background="White">
+                    <TextBlock Text="Root:" Width="100"></TextBlock>
+                    <TextBox Text="{Binding Root}" Width="250"></TextBox>
+                </StackPanel>
+
+                <!-- Folder -->
+                <StackPanel Orientation="Horizontal" Background="White">
+                    <TextBlock Text="Folder:" Width="100"></TextBlock>
+                    <TextBox Text="{Binding Folder}" Width="250"></TextBox>
+                    <CheckBox IsChecked="{Binding FolderIsRegex}">Use Regex</CheckBox>
+                    <TextBlock Padding="10 0 0 0">Or use Windows Wildcards</TextBlock>
+                </StackPanel>
+
+                <!-- File -->
+                <StackPanel Orientation="Horizontal" Background="White">
+                    <TextBlock Text="File:" Width="100"></TextBlock>
+                    <TextBox Text="{Binding File}" Width="250"></TextBox>
+                    <CheckBox IsChecked="{Binding FileIsRegex}">Use Regex</CheckBox>
+                    <TextBlock Padding="10 0 0 0">Or use Windows Wildcards</TextBlock>
+                </StackPanel>
+                <!-- Content -->
+                <StackPanel Orientation="Horizontal" Background="White">
+                    <TextBlock Text="Content:" Width="100"></TextBlock>
+                    <TextBox Text="{Binding Content}" Width="250"></TextBox>
+                    <CheckBox IsChecked="{Binding ContentIsRegex}">Use Regex</CheckBox>
+                </StackPanel>
+            </StackPanel>
+
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Header="Filters" IsEnabled="False">
+            <StackPanel>
+                <!-- Date Created -->
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox IsChecked="{Binding DateCreatedIsChecked}"></CheckBox>
+                    <TextBlock Text="Date Created:" Width="100"></TextBlock>
+                    <ComboBox SelectedItem="{Binding DateCreatedOperator}" Width="100">
+                        <ComboBoxItem>&lt; Before</ComboBoxItem>
+                        <ComboBoxItem>&lt;= Before or on</ComboBoxItem>
+                        <ComboBoxItem>= On</ComboBoxItem>
+                        <ComboBoxItem>&lt;&gt; Between</ComboBoxItem>
+                        <ComboBoxItem>&gt;= After or on</ComboBoxItem>
+                        <ComboBoxItem>&gt; After</ComboBoxItem>
+                    </ComboBox>
+                    <DatePicker SelectedDate="{Binding DateCreatedFrom}"></DatePicker>
+                    <DatePicker SelectedDate="{Binding DateCreatedTo}" Visibility="{Binding DateCreatedToIsVisible}"></DatePicker>
+                </StackPanel>
+
+                <!-- Date Modified -->
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox IsChecked="{Binding DateModifiedIsChecked}"></CheckBox>
+                    <TextBlock Text="Date Modified:" Width="100"></TextBlock>
+                    <ComboBox SelectedItem="{Binding DateModifiedOperator}" Width="100">
+                        <ComboBoxItem>&lt; Before</ComboBoxItem>
+                        <ComboBoxItem>&lt;= Before or on</ComboBoxItem>
+                        <ComboBoxItem>= On</ComboBoxItem>
+                        <ComboBoxItem>&lt;&gt; Between</ComboBoxItem>
+                        <ComboBoxItem>&gt;= After or on</ComboBoxItem>
+                        <ComboBoxItem>&gt; After</ComboBoxItem>
+                    </ComboBox>
+                    <DatePicker SelectedDate="{Binding DateModifiedFrom}"></DatePicker>
+                    <DatePicker SelectedDate="{Binding DateModifiedTo}" Visibility="{Binding DateModifiedToIsVisible}"></DatePicker>
+                </StackPanel>
+
+                <!-- Size -->
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox IsChecked="{Binding SizeIsChecked}"></CheckBox>
+                    <TextBlock Text="Size:" Width="100"></TextBlock>
+                    <ComboBox SelectedItem="{Binding SizeOperator}" Width="100">
+                        <ComboBoxItem>&lt; Less than</ComboBoxItem>
+                        <ComboBoxItem>&lt;= Less than or equal</ComboBoxItem>
+                        <ComboBoxItem>= Equal</ComboBoxItem>
+                        <ComboBoxItem>&gt; &lt; Between</ComboBoxItem>
+                        <ComboBoxItem>&gt;= Greater than or equal</ComboBoxItem>
+                        <ComboBoxItem>&gt; Greater than</ComboBoxItem>
+                    </ComboBox>
+                    <TextBox Text="{Binding SizeFrom}" Width="75"></TextBox>
+                    <ComboBox SelectedItem="{Binding SizeFromUnit}" Width="100">
+                        <ComboBoxItem>Byte</ComboBoxItem>
+                        <ComboBoxItem>Kilobyte</ComboBoxItem>
+                        <ComboBoxItem>Megabyte</ComboBoxItem>
+                        <ComboBoxItem>Gigabyte</ComboBoxItem>
+                        <ComboBoxItem>Terabyte</ComboBoxItem>
+                    </ComboBox>
+
+                    <TextBox Text="{Binding SizeTo}" Visibility="{Binding SizeToIsVisible}" Width="75"></TextBox>
+                    <ComboBox SelectedItem="{Binding SizeToUnit}" Visibility="{Binding SizeToUnitIsVisible}" Width="100">
+                        <ComboBoxItem>Byte</ComboBoxItem>
+                        <ComboBoxItem>Kilobyte</ComboBoxItem>
+                        <ComboBoxItem>Megabyte</ComboBoxItem>
+                        <ComboBoxItem>Gigabyte</ComboBoxItem>
+                        <ComboBoxItem>Terabyte</ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <Button Grid.Row="2" HorizontalAlignment="Center" Command="{Binding Search}" Padding="3" Margin="5" IsDefault="True">Search</Button>
+
+        <GroupBox Grid.Row="3" Header="Progress">
+            <StackPanel>
+                <!--<TextBlock Background="Silver" HorizontalAlignment="Stretch"  Padding="25 3 0 3" FontWeight="Bold">Results</TextBlock>-->
+
+                <!-- Column Headers -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text=" " Width="100"></TextBlock>
+                    <TextBox Text="Found" Background="#FFC9CEDC" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right" IsReadOnly="True"/>
+                    <TextBox Text="Searched" Background="#FFC9CEDC" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right" IsReadOnly="True"/>
+                    <TextBox Text="Name Matched" Background="#FFC9CEDC" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right" IsReadOnly="True"/>
+                </StackPanel>
+
+                <!-- Folders -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Text="Folders:" Width="100"></TextBox>
+                    <TextBox Text="{Binding FoldersFound}" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <TextBox Text="{Binding FoldersSearched}" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <TextBox Text="{Binding FoldersMatched}" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                </StackPanel>
+
+                <!-- Files -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Text="Files:" Width="100"></TextBox>
+                    <TextBox Text="{Binding FilesFound}" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <TextBox Text="{Binding FilesSearched}" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <TextBox Text="{Binding FilesMatched}" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                </StackPanel>
+
+                <!-- Content Matching Label -->
+                <TextBlock Text="{Binding CurrentContentMatchingMessage}" Margin="10 5 0 0"></TextBlock>
+
+                <!-- Content Matching Progress -->
+
+                <ProgressBar Margin="10 0 0 5" Height="10" Minimum="0" Maximum="100" Value="{Binding ContentMatchingProgress}" Visibility="{Binding ContentMatchingProgressIsVisible}"></ProgressBar>
+
+                <!-- Found Label -->
+                <TextBlock Text="What's Found:"></TextBlock>
+
+            </StackPanel>
+
+
+        </GroupBox>
+        
+            <!-- Found Listbox -->
+        <ListBox Grid.Row="4" ItemsSource="{Binding FoundItems}" MinHeight="100" Name="FoundItems">
+
+        </ListBox>
+
+        <TextBox Grid.Row="5" Text="{Binding ElementName=FoundItems, Path=SelectedItem}"></TextBox>
+        
+    </Grid>
+
+</Window>
