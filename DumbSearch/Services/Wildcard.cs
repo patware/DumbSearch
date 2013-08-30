@@ -10,6 +10,7 @@ namespace DumbSearch.Services
     /// Represents a wildcard running on the
     /// <see cref="System.Text.RegularExpressions"/> engine.
     /// </summary>
+    [Serializable]
     public class Wildcard : Regex
     {
         /// <summary>
@@ -30,6 +31,11 @@ namespace DumbSearch.Services
         public Wildcard(string pattern, RegexOptions options)
             : base(WildcardToRegex(pattern), options)
         {
+        }
+
+        protected Wildcard(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context):base(info,context)
+        {
+
         }
 
         /// <summary>

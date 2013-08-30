@@ -6,7 +6,7 @@ using System.IO;
 
 namespace DumbSearch.Services
 {
-    public class FileSystem : DumbSearch.Services.IFileSystem
+    public sealed class FileSystem : DumbSearch.Services.IFileSystem
     {
         #region IFileSystem Members
 

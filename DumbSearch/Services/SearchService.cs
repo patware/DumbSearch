@@ -6,7 +6,7 @@ using System.IO;
 
 namespace DumbSearch.Services
 {
-    public class SearchService : DumbSearch.Services.ISearchService
+    public sealed class SearchService : DumbSearch.Services.ISearchService
     {
         private readonly Services.IFileSystem _fileSystemService;
 

@@ -86,9 +86,7 @@ namespace DumbSearch.ViewModel
                 GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Messages.ContentMatched>(this, doContentMatched);
 
             }
-
-            _searchTask = new System.Threading.Tasks.Task(doSearch);
-
+            
             init();
         }
 
@@ -1559,5 +1557,6 @@ namespace DumbSearch.ViewModel
         }
 
         #endregion
+
     }
 }
