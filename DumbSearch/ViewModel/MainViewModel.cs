@@ -19,13 +19,17 @@ namespace DumbSearch.ViewModel
     public class MainViewModel : ViewModelBase
     {
         private readonly IDataService _dataService;
+        private readonly Services.ISearchService _searchHelper;
+        private DispatcherTimer _timer;
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public MainViewModel(IDataService dataService)
+        public MainViewModel(IDataService dataService, Services.ISearchService searchHelper)
         {
             _dataService = dataService;
+            _searchHelper = searchHelper;
+
             _dataService.GetData(
                 (item, error) =>
                 {
@@ -51,14 +55,14 @@ namespace DumbSearch.ViewModel
                 _dateModifiedToIsVisible = true;
                 _file = "...File...";
                 _fileIsRegex = true;
-                _filesFound = "Files Found";
+                _filesDiscovered = "Files Discovered";
                 _filesMatched = "Files Matched";
-                _filesSearched = "Files Searched";
+                _filesSurveyed = "Files Surveyed";
                 _folder = "...Folder...";
                 _folderIsRegex = true;
-                _foldersFound = "Folders Found";
+                _foldersDiscovered = "Folders Discovered";
                 _foldersMatched = "Folders Matched";
-                _foldersSearched = "Folders Searched";
+                _foldersSurveyed = "Folders Surveyed";
                 _foundItems.Add("C:\\Foo");
                 _root = "...Root...";
                 _sizeFrom = 123;
@@ -68,7 +72,7 @@ namespace DumbSearch.ViewModel
                 _sizeToIsVisible = true;
                 _sizeToUnit = "Gigabyte";
                 _sizeToUnitIsVisible = true;
-
+                _status = "Lorem Ipsum Status";
             }
             else
             {
@@ -82,17 +86,84 @@ namespace DumbSearch.ViewModel
                 GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Messages.ContentMatched>(this, doContentMatched);
 
             }
+
+            _searchTask = new System.Threading.Tasks.Task(doSearch);
+
+            init();
         }
 
+        private void init()
+        {
+            _searchParameters = new Model.SearchParameters();
 
+            _timer = new DispatcherTimer(DispatcherPriority.Background);
+            _timer.Interval = new TimeSpan(0,0,1);
+            _timer.IsEnabled = true;
+            _timer.Tick += _timer_Tick;
+            _timer.Start();
+        }
 
-        ////public override void Cleanup()
-        ////{
-        ////    // Clean up if needed
+        #region Timer for the UI
+        void _timer_Tick(object sender, EventArgs e)
+        {
+            if (_searchTask == null)
+                this.Status = "Nothing is happening";
+            else
+                switch (_searchTask.Status)
+                {
+                    case System.Threading.Tasks.TaskStatus.Canceled:
+                        this.Status = "Canceled";
+                        break;
+                    case System.Threading.Tasks.TaskStatus.Created:
+                        this.Status = "Waiting to start";
+                        break;
+                    case System.Threading.Tasks.TaskStatus.Faulted:
+                        this.Status = "Faulted !  An exception has occured";
+                        break;
+                    case System.Threading.Tasks.TaskStatus.RanToCompletion:
+                        this.Status = "Finished.  All done";
+                        break;
+                    case System.Threading.Tasks.TaskStatus.Running:
+                        this.Status = "Running";
+                        break;
+                    case System.Threading.Tasks.TaskStatus.WaitingForActivation:
+                        this.Status = "Motors are reving up, can you hear the gears?";
+                        break;
+                    case System.Threading.Tasks.TaskStatus.WaitingForChildrenToComplete:
+                        this.Status = "All done, winding down";
+                        break;
+                    case System.Threading.Tasks.TaskStatus.WaitingToRun:
+                        this.Status = "We're next on the runway";
+                        break;
+                    default:
+                        this.Status = "Unknown";
+                        break;
+                }
+            
+        }
+        #endregion
 
-        ////    base.Cleanup();
-        ////}
+        
+        private Model.SearchParameters _searchParameters;
+        private void doSearch()
+        {
+            _searchParameters.Root = _root;
+            _searchParameters.Folder = _folder;
+            _searchParameters.FolderIsRegex = _folderIsRegex;
+            _searchParameters.FileName = _file;
+            _searchParameters.FileNameIsRegex = _fileIsRegex;
+            _searchParameters.Content = _content;
+            _searchParameters.ContentIsRegex = _contentIsRegex;
 
+            _searchHelper.Search(_searchParameters);
+
+            this.CurrentContentMatchingMessage = string.Empty;
+            this.ContentMatchingProgress = 0;
+            this.ContentMatchingProgressIsVisible = false;
+
+            _search.RaiseCanExecuteChanged();
+        }
+        
         #region Properties
 
         #region ApplicationTitle
@@ -1035,71 +1106,36 @@ namespace DumbSearch.ViewModel
 
         #endregion
 
-        #region FoldersFound
+        #region FoldersDiscovered
 
         /// <summary>
-        /// The <see cref="FoldersFound" /> property's name.
+        /// The <see cref="FoldersDiscovered" /> property's name.
         /// </summary>
-        public const string FoldersFoundPropertyName = "FoldersFound";
+        public const string FoldersDiscoveredPropertyName = "FoldersDiscovered";
 
-        private string _foldersFound = string.Empty;
+        private string _foldersDiscovered = string.Empty;
 
         /// <summary>
-        /// Sets and gets the FoldersFound property.
+        /// Sets and gets the FoldersDiscovered property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public string FoldersFound
+        public string FoldersDiscovered
         {
             get
             {
-                return _foldersFound;
+                return _foldersDiscovered;
             }
 
             set
             {
-                if (_foldersFound == value)
+                if (_foldersDiscovered == value)
                 {
                     return;
                 }
 
-                RaisePropertyChanging(FoldersFoundPropertyName);
-                _foldersFound = value;
-                RaisePropertyChanged(FoldersFoundPropertyName);
-            }
-        }
-
-        #endregion
-
-        #region FoldersSearched
-
-        /// <summary>
-        /// The <see cref="FoldersSearched" /> property's name.
-        /// </summary>
-        public const string FoldersSearchedPropertyName = "FoldersSearched";
-
-        private string _foldersSearched = string.Empty;
-
-        /// <summary>
-        /// Sets and gets the FoldersSearched property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public string FoldersSearched
-        {
-            get
-            {
-                return _foldersSearched;
-            }
-
-            set
-            {
-                if (_foldersSearched == value)
-                {
-                    return;
-                }
-
-                RaisePropertyChanging(FoldersSearchedPropertyName);
-                _foldersSearched = value;
-                RaisePropertyChanged(FoldersSearchedPropertyName);
+                RaisePropertyChanging(FoldersDiscoveredPropertyName);
+                _foldersDiscovered = value;
+                RaisePropertyChanged(FoldersDiscoveredPropertyName);
             }
         }
 
@@ -1140,71 +1176,71 @@ namespace DumbSearch.ViewModel
 
         #endregion
 
-        #region FilesFound
+        #region FoldersSurveyed
 
         /// <summary>
-        /// The <see cref="FilesFound" /> property's name.
+        /// The <see cref="FoldersSurveyed" /> property's name.
         /// </summary>
-        public const string FilesFoundPropertyName = "FilesFound";
+        public const string FoldersSurveyedPropertyName = "FoldersSurveyed";
 
-        private string _filesFound = string.Empty;
+        private string _foldersSurveyed = string.Empty;
 
         /// <summary>
-        /// Sets and gets the FilesFound property.
+        /// Sets and gets the FoldersSurveyed property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public string FilesFound
+        public string FoldersSurveyed
         {
             get
             {
-                return _filesFound;
+                return _foldersSurveyed;
             }
 
             set
             {
-                if (_filesFound == value)
+                if (_foldersSurveyed == value)
                 {
                     return;
                 }
 
-                RaisePropertyChanging(FilesFoundPropertyName);
-                _filesFound = value;
-                RaisePropertyChanged(FilesFoundPropertyName);
+                RaisePropertyChanging(FoldersSurveyedPropertyName);
+                _foldersSurveyed = value;
+                RaisePropertyChanged(FoldersSurveyedPropertyName);
             }
         }
 
         #endregion
-
-        #region FilesSearched
+        
+        #region FilesDiscovered
 
         /// <summary>
-        /// The <see cref="FilesSearched" /> property's name.
+        /// The <see cref="FilesDiscovered" /> property's name.
         /// </summary>
-        public const string FilesSearchedPropertyName = "FilesSearched";
+        public const string FilesDiscoveredPropertyName = "FilesDiscovered";
 
-        private string _filesSearched = string.Empty;
+        private string _filesDiscovered = string.Empty;
 
         /// <summary>
-        /// Sets and gets the FilesSearched property.
+        /// Sets and gets the FilesDiscovered property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public string FilesSearched
+        public string FilesDiscovered
         {
             get
             {
-                return _filesSearched;
+                return _filesDiscovered;
             }
 
             set
             {
-                if (_filesSearched == value)
+                if (_filesDiscovered == value)
                 {
                     return;
                 }
 
-                RaisePropertyChanging(FilesSearchedPropertyName);
-                _filesSearched = value;
-                RaisePropertyChanged(FilesSearchedPropertyName);
+                RaisePropertyChanging(FilesDiscoveredPropertyName);
+                _filesDiscovered = value;
+                RaisePropertyChanged(FilesDiscoveredPropertyName);
             }
         }
 
@@ -1245,6 +1281,41 @@ namespace DumbSearch.ViewModel
 
         #endregion
 
+        #region FilesSurveyed
+
+        /// <summary>
+        /// The <see cref="FilesSurveyed" /> property's name.
+        /// </summary>
+        public const string FilesSurveyedPropertyName = "FilesSurveyed";
+
+        private string _filesSurveyed = string.Empty;
+
+        /// <summary>
+        /// Sets and gets the FilesSurveyed property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public string FilesSurveyed
+        {
+            get
+            {
+                return _filesSurveyed;
+            }
+
+            set
+            {
+                if (_filesSurveyed == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(FilesSurveyedPropertyName);
+                _filesSurveyed = value;
+                RaisePropertyChanged(FilesSurveyedPropertyName);
+            }
+        }
+
+        #endregion
+        
         #region ContentMatchingProgress
 
         /// <summary>
@@ -1374,11 +1445,45 @@ namespace DumbSearch.ViewModel
 
         #endregion
 
+        #region Status
+        /// <summary>
+        /// The <see cref="Status" /> property's name.
+        /// </summary>
+        public const string StatusPropertyName = "Status";
+
+        private string _status;
+
+        /// <summary>
+        /// Sets and gets the Status property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public string Status
+        {
+            get
+            {
+                return _status;
+            }
+
+            set
+            {
+                if (_status == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(StatusPropertyName);
+                _status = value;
+                RaisePropertyChanged(StatusPropertyName);
+            }
+        }
+        #endregion
+        
         #endregion
 
         #region Commands
         private RelayCommand _search;
 
+        private System.Threading.Tasks.Task _searchTask = null;
         /// <summary>
         /// Gets the Search.
         /// </summary>
@@ -1390,36 +1495,22 @@ namespace DumbSearch.ViewModel
                     ?? (_search = new RelayCommand(
                                           () =>
                                           {
+
                                               if (string.IsNullOrEmpty(_root))
                                               {
                                                   this.Root = System.IO.Directory.GetCurrentDirectory();
                                               }
-
-                                              var searchParameters = new Model.SearchParameters()
-                                              {
-                                                  Root = _root,
-                                                  Folder = _folder,
-                                                  FolderIsRegex = _folderIsRegex,
-                                                  FileName = _file,
-                                                  FileNameIsRegex = _fileIsRegex,
-                                                  Content = _content,
-                                                  ContentIsRegex = _contentIsRegex
-                                              };
-
-                                              var searchHelper = new Services.SearchHelper();
-                                              //Model.Results results;
-
-                                              var t = System.Threading.Tasks.Task.Factory.StartNew(() => {
-                                                  searchHelper.Search(searchParameters);
-
-                                                  this.CurrentContentMatchingMessage = string.Empty;
-                                                  this.ContentMatchingProgress = 0;
-                                                  this.ContentMatchingProgressIsVisible = false;
-
-                                              });
+                                              
+                                              _searchTask = System.Threading.Tasks.Task.Factory.StartNew(doSearch);
 
                                           },
-                                          () => true));
+                                          () => 
+                                              _searchTask == null 
+                                              || _searchTask.Status == System.Threading.Tasks.TaskStatus.Created
+                                              || _searchTask.Status == System.Threading.Tasks.TaskStatus.RanToCompletion
+                                              || _searchTask.Status == System.Threading.Tasks.TaskStatus.Canceled
+                                              || _searchTask.Status == System.Threading.Tasks.TaskStatus.Faulted
+                                          ));
             }
         }
         #endregion
@@ -1428,21 +1519,17 @@ namespace DumbSearch.ViewModel
 
         private void doSearchStarted(Messages.SearchStarted searchStarted)
         {
-            System.Windows.Application.Current.Dispatcher.Invoke(
-                System.Windows.Threading.DispatcherPriority.Normal,
-                (Action)delegate()
-            {
-                this.FoundItems.Clear();
-            });
+            GalaSoft.MvvmLight.Threading.DispatcherHelper.CheckBeginInvokeOnUI(() => { this.FoundItems.Clear(); });
+
         }
         public void doThereIsProgress(Messages.ThereIsProgress thereIsProgress)
         {
-            this.FoldersFound = thereIsProgress.Content.FoldersFound.ToString();
-            this.FoldersSearched = thereIsProgress.Content.FoldersSearched.ToString();
+            this.FoldersDiscovered = thereIsProgress.Content.FoldersDiscovered.ToString();
+            this.FoldersSurveyed = thereIsProgress.Content.FoldersSurveyed.ToString();
             this.FoldersMatched = thereIsProgress.Content.FoldersMatched.ToString();
 
-            this.FilesFound = thereIsProgress.Content.FilesFound.ToString();
-            this.FilesSearched = thereIsProgress.Content.FilesSearched.ToString();
+            this.FilesDiscovered = thereIsProgress.Content.FilesDiscovered.ToString();
+            this.FilesSurveyed = thereIsProgress.Content.FilesSurveyed.ToString();
             this.FilesMatched = thereIsProgress.Content.FilesMatched.ToString();
 
             this.ContentMatchingProgressIsVisible = true;
@@ -1456,26 +1543,19 @@ namespace DumbSearch.ViewModel
 
         public void doFileMatched(Messages.FileMatched fileMatched)
         {
-            System.Windows.Application.Current.Dispatcher.Invoke(
-                   System.Windows.Threading.DispatcherPriority.Normal,
-                   (Action)delegate()
-                   {
-                       this.FoundItems.Add(fileMatched.Content.FullName);
-                   });
+            GalaSoft.MvvmLight.Threading.DispatcherHelper.CheckBeginInvokeOnUI(() => { this.FoundItems.Add(fileMatched.Content.FullName); });
         }
 
         private void doContentMatched(Messages.ContentMatched contentMatched)
         {
-            System.Windows.Application.Current.Dispatcher.Invoke(
-                System.Windows.Threading.DispatcherPriority.Normal,
-                (Action)delegate()
-                {
-                    this.FoundItems.Add(
-                        string.Format(
-                            "{0} on line {1}"
-                            , contentMatched.Content.FullName
-                            , contentMatched.LineNumber));
-                });
+            GalaSoft.MvvmLight.Threading.DispatcherHelper.CheckBeginInvokeOnUI(() => {
+                this.FoundItems.Add(
+                    string.Format(
+                        "{0} on line {1}"
+                        , contentMatched.Content.FullName
+                        , contentMatched.LineNumber));
+
+            });
         }
 
         #endregion

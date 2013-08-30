@@ -38,6 +38,9 @@ namespace DumbSearch.ViewModel
                 SimpleIoc.Default.Register<IDataService, DataService>();
             }
 
+            SimpleIoc.Default.Register<Services.IFileSystem, Services.FileSystem>();
+            SimpleIoc.Default.Register<Services.ISearchService, Services.SearchService>();
+
             SimpleIoc.Default.Register<MainViewModel>();
         }
 

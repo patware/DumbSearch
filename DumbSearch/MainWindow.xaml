@@ -15,14 +15,14 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Skins/MainSkin.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            
+
             <Style TargetType="TextBox">
                 <!--<Setter Property="Margin" Value="3"/>-->
             </Style>
-            
+
         </ResourceDictionary>
     </Window.Resources>
-    
+
     <Grid x:Name="LayoutRoot">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -33,36 +33,36 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <GroupBox Grid.Row="0" Header="Files and Folders" Margin="3" Padding="3">  
+        <GroupBox Grid.Row="0" Header="Files and Folders" Margin="3" Padding="3">
             <StackPanel>
                 <!--<TextBlock HorizontalAlignment="Stretch" Padding="25 3 0 3" FontWeight="Bold">File Name Parameters</TextBlock>-->
 
                 <!-- Root -->
-                <StackPanel Orientation="Horizontal" Background="White">
+                <StackPanel Orientation="Horizontal" Background="White" Margin="2">
                     <TextBlock Text="Root:" Width="100"></TextBlock>
-                    <TextBox Text="{Binding Root}" Width="250"></TextBox>
+                    <TextBox Text="{Binding Root, UpdateSourceTrigger=PropertyChanged}" Width="250"></TextBox>
                 </StackPanel>
 
                 <!-- Folder -->
-                <StackPanel Orientation="Horizontal" Background="White">
+                <StackPanel Orientation="Horizontal" Background="White" Margin="2">
                     <TextBlock Text="Folder:" Width="100"></TextBlock>
-                    <TextBox Text="{Binding Folder}" Width="250"></TextBox>
-                    <CheckBox IsChecked="{Binding FolderIsRegex}">Use Regex</CheckBox>
-                    <TextBlock Padding="10 0 0 0">Or use Windows Wildcards</TextBlock>
+                    <TextBox Text="{Binding Folder, UpdateSourceTrigger=PropertyChanged}" Width="250"></TextBox>
+                    <CheckBox IsChecked="{Binding FolderIsRegex}" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="5 0 0 0">Use Regex</CheckBox>
+                    <TextBlock Padding="10 0 0 0" VerticalAlignment="Center">Or use Windows Wildcards</TextBlock>
                 </StackPanel>
 
                 <!-- File -->
-                <StackPanel Orientation="Horizontal" Background="White">
+                <StackPanel Orientation="Horizontal" Background="White" Margin="2">
                     <TextBlock Text="File:" Width="100"></TextBlock>
-                    <TextBox Text="{Binding File}" Width="250"></TextBox>
-                    <CheckBox IsChecked="{Binding FileIsRegex}">Use Regex</CheckBox>
-                    <TextBlock Padding="10 0 0 0">Or use Windows Wildcards</TextBlock>
+                    <TextBox Text="{Binding File, UpdateSourceTrigger=PropertyChanged}" Width="250"></TextBox>
+                    <CheckBox IsChecked="{Binding FileIsRegex}" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="5 0 0 0">Use Regex</CheckBox>
+                    <TextBlock Padding="10 0 0 0" VerticalAlignment="Center">Or use Windows Wildcards</TextBlock>
                 </StackPanel>
                 <!-- Content -->
-                <StackPanel Orientation="Horizontal" Background="White">
+                <StackPanel Orientation="Horizontal" Background="White" Margin="2">
                     <TextBlock Text="Content:" Width="100"></TextBlock>
-                    <TextBox Text="{Binding Content}" Width="250"></TextBox>
-                    <CheckBox IsChecked="{Binding ContentIsRegex}">Use Regex</CheckBox>
+                    <TextBox Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}" Width="250"></TextBox>
+                    <CheckBox IsChecked="{Binding ContentIsRegex}" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="5 0 0 0">Use Regex</CheckBox>
                 </StackPanel>
             </StackPanel>
 
@@ -71,10 +71,10 @@
         <GroupBox Grid.Row="1" Header="Filters" IsEnabled="False">
             <StackPanel>
                 <!-- Date Created -->
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox IsChecked="{Binding DateCreatedIsChecked}"></CheckBox>
-                    <TextBlock Text="Date Created:" Width="100"></TextBlock>
-                    <ComboBox SelectedItem="{Binding DateCreatedOperator}" Width="100">
+                <StackPanel Orientation="Horizontal" Margin="2">
+                    <CheckBox IsChecked="{Binding DateCreatedIsChecked}" VerticalAlignment="Center" VerticalContentAlignment="Center"></CheckBox>
+                    <TextBlock Text="Date Created:" Width="100" VerticalAlignment="Center" Margin="5 0 0 0"></TextBlock>
+                    <ComboBox SelectedItem="{Binding DateCreatedOperator}" Width="100" Margin="2">
                         <ComboBoxItem>&lt; Before</ComboBoxItem>
                         <ComboBoxItem>&lt;= Before or on</ComboBoxItem>
                         <ComboBoxItem>= On</ComboBoxItem>
@@ -82,15 +82,15 @@
                         <ComboBoxItem>&gt;= After or on</ComboBoxItem>
                         <ComboBoxItem>&gt; After</ComboBoxItem>
                     </ComboBox>
-                    <DatePicker SelectedDate="{Binding DateCreatedFrom}"></DatePicker>
-                    <DatePicker SelectedDate="{Binding DateCreatedTo}" Visibility="{Binding DateCreatedToIsVisible}"></DatePicker>
+                    <DatePicker SelectedDate="{Binding DateCreatedFrom}" Margin="2"></DatePicker>
+                    <DatePicker SelectedDate="{Binding DateCreatedTo}" Visibility="{Binding DateCreatedToIsVisible}" Margin="2"></DatePicker>
                 </StackPanel>
 
                 <!-- Date Modified -->
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox IsChecked="{Binding DateModifiedIsChecked}"></CheckBox>
-                    <TextBlock Text="Date Modified:" Width="100"></TextBlock>
-                    <ComboBox SelectedItem="{Binding DateModifiedOperator}" Width="100">
+                <StackPanel Orientation="Horizontal" Margin="2">
+                    <CheckBox IsChecked="{Binding DateModifiedIsChecked}" VerticalAlignment="Center" VerticalContentAlignment="Center"></CheckBox>
+                    <TextBlock Text="Date Modified:" Width="100" VerticalAlignment="Center" Margin="5 0 0 0"></TextBlock>
+                    <ComboBox SelectedItem="{Binding DateModifiedOperator}" Width="100" Margin="2">
                         <ComboBoxItem>&lt; Before</ComboBoxItem>
                         <ComboBoxItem>&lt;= Before or on</ComboBoxItem>
                         <ComboBoxItem>= On</ComboBoxItem>
@@ -98,15 +98,15 @@
                         <ComboBoxItem>&gt;= After or on</ComboBoxItem>
                         <ComboBoxItem>&gt; After</ComboBoxItem>
                     </ComboBox>
-                    <DatePicker SelectedDate="{Binding DateModifiedFrom}"></DatePicker>
-                    <DatePicker SelectedDate="{Binding DateModifiedTo}" Visibility="{Binding DateModifiedToIsVisible}"></DatePicker>
+                    <DatePicker SelectedDate="{Binding DateModifiedFrom}" Margin="2"></DatePicker>
+                    <DatePicker SelectedDate="{Binding DateModifiedTo}" Visibility="{Binding DateModifiedToIsVisible}" Margin="2"></DatePicker>
                 </StackPanel>
 
                 <!-- Size -->
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox IsChecked="{Binding SizeIsChecked}"></CheckBox>
-                    <TextBlock Text="Size:" Width="100"></TextBlock>
-                    <ComboBox SelectedItem="{Binding SizeOperator}" Width="100">
+                <StackPanel Orientation="Horizontal" Margin="2">
+                    <CheckBox IsChecked="{Binding SizeIsChecked}" VerticalAlignment="Center" VerticalContentAlignment="Center"></CheckBox>
+                    <TextBlock Text="Size:" Width="100" VerticalAlignment="Center" Margin="5 0 0 0"></TextBlock>
+                    <ComboBox SelectedItem="{Binding SizeOperator}" Width="100" Margin="2">
                         <ComboBoxItem>&lt; Less than</ComboBoxItem>
                         <ComboBoxItem>&lt;= Less than or equal</ComboBoxItem>
                         <ComboBoxItem>= Equal</ComboBoxItem>
@@ -114,8 +114,8 @@
                         <ComboBoxItem>&gt;= Greater than or equal</ComboBoxItem>
                         <ComboBoxItem>&gt; Greater than</ComboBoxItem>
                     </ComboBox>
-                    <TextBox Text="{Binding SizeFrom}" Width="75"></TextBox>
-                    <ComboBox SelectedItem="{Binding SizeFromUnit}" Width="100">
+                    <TextBox Text="{Binding SizeFrom}" Width="75" Margin="2"></TextBox>
+                    <ComboBox SelectedItem="{Binding SizeFromUnit}" Width="100" Margin="2">
                         <ComboBoxItem>Byte</ComboBoxItem>
                         <ComboBoxItem>Kilobyte</ComboBoxItem>
                         <ComboBoxItem>Megabyte</ComboBoxItem>
@@ -123,8 +123,8 @@
                         <ComboBoxItem>Terabyte</ComboBoxItem>
                     </ComboBox>
 
-                    <TextBox Text="{Binding SizeTo}" Visibility="{Binding SizeToIsVisible}" Width="75"></TextBox>
-                    <ComboBox SelectedItem="{Binding SizeToUnit}" Visibility="{Binding SizeToUnitIsVisible}" Width="100">
+                    <TextBox Text="{Binding SizeTo}" Visibility="{Binding SizeToIsVisible}" Width="75" Margin="2"></TextBox>
+                    <ComboBox SelectedItem="{Binding SizeToUnit}" Visibility="{Binding SizeToUnitIsVisible}" Width="100" Margin="2">
                         <ComboBoxItem>Byte</ComboBoxItem>
                         <ComboBoxItem>Kilobyte</ComboBoxItem>
                         <ComboBoxItem>Megabyte</ComboBoxItem>
@@ -135,7 +135,11 @@
             </StackPanel>
         </GroupBox>
 
-        <Button Grid.Row="2" HorizontalAlignment="Center" Command="{Binding Search}" Padding="3" Margin="5" IsDefault="True">Search</Button>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button HorizontalAlignment="Center" Command="{Binding Search}" Padding="3" Margin="5" IsDefault="True">Search</Button>
+            <TextBlock Text="{Binding Status}" MinWidth="200" VerticalAlignment="Center" Padding="5" Margin="5"></TextBlock>
+        </StackPanel>
+        
 
         <GroupBox Grid.Row="3" Header="Progress">
             <StackPanel>
@@ -144,25 +148,25 @@
                 <!-- Column Headers -->
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text=" " Width="100"></TextBlock>
-                    <TextBox Text="Found" Background="#FFC9CEDC" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right" IsReadOnly="True"/>
-                    <TextBox Text="Searched" Background="#FFC9CEDC" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right" IsReadOnly="True"/>
-                    <TextBox Text="Name Matched" Background="#FFC9CEDC" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right" IsReadOnly="True"/>
+                    <TextBox Text="Discovered" Background="#FFC9CEDC" Width="90" HorizontalAlignment="Center" HorizontalContentAlignment="Center" IsReadOnly="True" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBox Text="Name Matched" Background="#FFC9CEDC" Width="90" HorizontalAlignment="Center" HorizontalContentAlignment="Center" IsReadOnly="True" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBox Text="Surveyed" Background="#FFC9CEDC" Width="90" HorizontalAlignment="Center" HorizontalContentAlignment="Center" IsReadOnly="True" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- Folders -->
                 <StackPanel Orientation="Horizontal">
                     <TextBox Text="Folders:" Width="100"></TextBox>
-                    <TextBox Text="{Binding FoldersFound}" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
-                    <TextBox Text="{Binding FoldersSearched}" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
-                    <TextBox Text="{Binding FoldersMatched}" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <TextBox Text="{Binding FoldersDiscovered}" Width="90" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding FoldersMatched}" Width="90" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding FoldersSurveyed}" Width="90" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- Files -->
                 <StackPanel Orientation="Horizontal">
                     <TextBox Text="Files:" Width="100"></TextBox>
-                    <TextBox Text="{Binding FilesFound}" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
-                    <TextBox Text="{Binding FilesSearched}" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
-                    <TextBox Text="{Binding FilesMatched}" Width="90" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <TextBox Text="{Binding FilesDiscovered}" Width="90" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding FilesMatched}" Width="90" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding FilesSurveyed}" Width="90" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- Content Matching Label -->
@@ -179,14 +183,14 @@
 
 
         </GroupBox>
-        
-            <!-- Found Listbox -->
+
+        <!-- Found Listbox -->
         <ListBox Grid.Row="4" ItemsSource="{Binding FoundItems}" MinHeight="100" Name="FoundItems">
 
         </ListBox>
 
         <TextBox Grid.Row="5" Text="{Binding ElementName=FoundItems, Path=SelectedItem}"></TextBox>
-        
+
     </Grid>
 
 </Window>

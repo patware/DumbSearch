@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{15059470-5766-4F4E-BE55-1668FE147DCE}</ProjectGuid>
+    <ProjectGuid>{AD448699-82BF-4093-A1AE-F6871E5E06F5}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DumbSearch</RootNamespace>
@@ -118,7 +118,11 @@
     <Compile Include="Model\DataItem.cs" />
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\IDataService.cs" />
-    <Compile Include="Services\SearchHelper.cs" />
+    <Compile Include="Services\FileSystem.cs" />
+    <Compile Include="Services\IFileSystem.cs" />
+    <Compile Include="Services\ISearchService.cs" />
+    <Compile Include="Services\SearchService.cs" />
+    <Compile Include="Services\Wildcard.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="Model\SearchParameters.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
