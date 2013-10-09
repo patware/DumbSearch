@@ -20,15 +20,20 @@ namespace DumbSearch.ViewModel
     {
         private readonly IDataService _dataService;
         private readonly Services.ISearchService _searchHelper;
-        private DispatcherTimer _timer;
+        private readonly Services.IFileSystem _fileService;
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public MainViewModel(IDataService dataService, Services.ISearchService searchHelper)
+        public MainViewModel(IDataService dataService, Services.ISearchService searchHelper, Services.IFileSystem fileService)
         {
+            this.PropertyChanged += MainViewModel_PropertyChanged;
+
             _dataService = dataService;
             _searchHelper = searchHelper;
+            _fileService = fileService;
+
+            ((Services.ILongRunning)_searchHelper).StatusChanged += SearchHelper_StatusChanged;
 
             _dataService.GetData(
                 (item, error) =>
@@ -80,72 +85,135 @@ namespace DumbSearch.ViewModel
 
                 _applicationTitle = string.Format("DumbSearch {0}.{1} - by Patware", version.Major, version.Minor);
 
-                GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Messages.SearchStarted>(this, doSearchStarted);
-                GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Messages.ThereIsProgress>(this, doThereIsProgress);
-                GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Messages.FileMatched>(this, doFileMatched);
-                GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Messages.ContentMatched>(this, doContentMatched);
+                GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Messages.SearchStarted>(this, onSearchStarted);
+                GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Messages.ThereIsProgress>(this, onThereIsProgress);
+                GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Messages.FileMatched>(this, onFileMatched);
+                GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Messages.ContentMatched>(this, onContentMatched);
 
             }
-            
+
             init();
+        }
+
+        void SearchHelper_StatusChanged(object sender, Services.StatusChangedEventArgs e)
+        {
+            Status = e.NewStatus.ToString();
+            _search.RaiseCanExecuteChanged();
+            _pause.RaiseCanExecuteChanged();
+            _stop.RaiseCanExecuteChanged();
+        }
+
+        void MainViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case SearchCriteriasAreValidPropertyName: break;
+                case RootPropertyName:
+                case FolderPropertyName:
+                case FolderIsRegexPropertyName:
+                case FilePropertyName:
+                case FileIsRegexPropertyName:
+                case ContentPropertyName:
+                case ContentIsRegexPropertyName:
+                case DateCreatedIsCheckedPropertyName:
+                case DateCreatedOperatorPropertyName:
+                case DateCreatedFromPropertyName:
+                case DateCreatedToPropertyName:
+                case DateModifiedIsCheckedPropertyName:
+                case DateModifiedOperatorPropertyName:
+                case DateModifiedFromPropertyName:
+                case DateModifiedToPropertyName:
+                case SizeIsCheckedPropertyName:
+                case SizeOperatorPropertyName:
+                case SizeFromPropertyName:
+                case SizeFromUnitPropertyName:
+                case SizeToPropertyName:
+                case SizeToUnitPropertyName:
+                    this.SearchCriteriasAreValid = areSearchCriteriasValid();
+                    break;
+            }
+        }
+
+        private bool areSearchCriteriasValid()
+        {
+            if (string.IsNullOrEmpty(Root))
+                return false;
+
+            if (!Directory.Exists(Root))
+                return false;
+
+            if (!string.IsNullOrEmpty(Folder))
+                if (FolderIsRegex)
+                {
+                    try
+                    {
+                        var r = new System.Text.RegularExpressions.Regex(Folder);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+
+            if (!string.IsNullOrEmpty(File))
+                if (FileIsRegex)
+                {
+                    try
+                    {
+                        var r = new System.Text.RegularExpressions.Regex(File);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+
+            if (!string.IsNullOrEmpty(Content))
+                if (ContentIsRegex)
+                {
+                    try
+                    {
+                        var r = new System.Text.RegularExpressions.Regex(Content);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+
+            if (string.IsNullOrEmpty(Folder) && string.IsNullOrEmpty(File) && string.IsNullOrEmpty(Content))
+                return false;
+
+            /*
+            DateCreatedIsCheckedPropertyName:
+            DateCreatedOperatorPropertyName:
+            DateCreatedFromPropertyName:
+            DateCreatedToPropertyName:
+            DateModifiedIsCheckedPropertyName:
+            DateModifiedOperatorPropertyName:
+            DateModifiedFromPropertyName:
+            DateModifiedToPropertyName:
+            SizeIsCheckedPropertyName:
+            SizeOperatorPropertyName:
+            SizeFromPropertyName:
+            SizeFromUnitPropertyName:
+            SizeToPropertyName:
+            SizeToUnitPropertyName:
+             */
+
+            return true;
         }
 
         private void init()
         {
             _searchParameters = new Model.SearchParameters();
-
-            _timer = new DispatcherTimer(DispatcherPriority.Background);
-            _timer.Interval = new TimeSpan(0,0,1);
-            _timer.IsEnabled = true;
-            _timer.Tick += _timer_Tick;
-            _timer.Start();
         }
 
-        #region Timer for the UI
-        void _timer_Tick(object sender, EventArgs e)
-        {
-            if (_searchTask == null)
-                this.Status = "Nothing is happening";
-            else
-                switch (_searchTask.Status)
-                {
-                    case System.Threading.Tasks.TaskStatus.Canceled:
-                        this.Status = "Canceled";
-                        break;
-                    case System.Threading.Tasks.TaskStatus.Created:
-                        this.Status = "Waiting to start";
-                        break;
-                    case System.Threading.Tasks.TaskStatus.Faulted:
-                        this.Status = "Faulted !  An exception has occured";
-                        break;
-                    case System.Threading.Tasks.TaskStatus.RanToCompletion:
-                        this.Status = "Finished.  All done";
-                        break;
-                    case System.Threading.Tasks.TaskStatus.Running:
-                        this.Status = "Running";
-                        break;
-                    case System.Threading.Tasks.TaskStatus.WaitingForActivation:
-                        this.Status = "Motors are reving up, can you hear the gears?";
-                        break;
-                    case System.Threading.Tasks.TaskStatus.WaitingForChildrenToComplete:
-                        this.Status = "All done, winding down";
-                        break;
-                    case System.Threading.Tasks.TaskStatus.WaitingToRun:
-                        this.Status = "We're next on the runway";
-                        break;
-                    default:
-                        this.Status = "Unknown";
-                        break;
-                }
-            
-        }
-        #endregion
 
-        
         private Model.SearchParameters _searchParameters;
         private void doSearch()
         {
-            _searchParameters.Root = _root;
+            _searchParameters.Root = new DirectoryInfo(_root);
             _searchParameters.Folder = _folder;
             _searchParameters.FolderIsRegex = _folderIsRegex;
             _searchParameters.FileName = _file;
@@ -161,7 +229,7 @@ namespace DumbSearch.ViewModel
 
             _search.RaiseCanExecuteChanged();
         }
-        
+
         #region Properties
 
         #region ApplicationTitle
@@ -1208,7 +1276,7 @@ namespace DumbSearch.ViewModel
         }
 
         #endregion
-        
+
         #region FilesDiscovered
 
         /// <summary>
@@ -1313,7 +1381,7 @@ namespace DumbSearch.ViewModel
         }
 
         #endregion
-        
+
         #region ContentMatchingProgress
 
         /// <summary>
@@ -1475,10 +1543,44 @@ namespace DumbSearch.ViewModel
             }
         }
         #endregion
-        
+
+        #region SearchCriteriasAreValid
+        /// <summary>
+        /// The <see cref="SearchCriteriasAreValid" /> property's name.
+        /// </summary>
+        public const string SearchCriteriasAreValidPropertyName = "SearchCriteriasAreValid";
+
+        private bool _searchCriteriasAreValid = false;
+
+        /// <summary>
+        /// Sets and gets the SearchCriteriasAreValid property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public bool SearchCriteriasAreValid
+        {
+            get
+            {
+                return _searchCriteriasAreValid;
+            }
+
+            set
+            {
+                if (_searchCriteriasAreValid == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(SearchCriteriasAreValidPropertyName);
+                _searchCriteriasAreValid = value;
+                RaisePropertyChanged(SearchCriteriasAreValidPropertyName);
+            }
+        }
+        #endregion
+
         #endregion
 
         #region Commands
+        #region Search
         private RelayCommand _search;
 
         private System.Threading.Tasks.Task _searchTask = null;
@@ -1493,34 +1595,109 @@ namespace DumbSearch.ViewModel
                     ?? (_search = new RelayCommand(
                                           () =>
                                           {
-
-                                              if (string.IsNullOrEmpty(_root))
-                                              {
-                                                  this.Root = System.IO.Directory.GetCurrentDirectory();
-                                              }
-                                              
-                                              _searchTask = System.Threading.Tasks.Task.Factory.StartNew(doSearch);
-
+                                              if (((Services.ILongRunning)_searchHelper).IsRunning)
+                                                  ((Services.ILongRunning)_searchHelper).Resume();
+                                              else
+                                                  _searchTask = System.Threading.Tasks.Task.Factory.StartNew(doSearch);
+                                                  
                                           },
-                                          () => 
-                                              _searchTask == null 
-                                              || _searchTask.Status == System.Threading.Tasks.TaskStatus.Created
-                                              || _searchTask.Status == System.Threading.Tasks.TaskStatus.RanToCompletion
-                                              || _searchTask.Status == System.Threading.Tasks.TaskStatus.Canceled
-                                              || _searchTask.Status == System.Threading.Tasks.TaskStatus.Faulted
+                                          () =>
+                                              // we can start a new search if:
+                                              //    we have all the info we need
+                                              //    and
+                                              //    there's not a task already started
+                                              this.SearchCriteriasAreValid &&
+                                              (
+                                                ((Services.ILongRunning)_searchHelper).CanRun
+                                              )
                                           ));
             }
         }
         #endregion
+        #region Pause
+        private RelayCommand _pause;
+
+        /// <summary>
+        /// Gets the Pause.
+        /// </summary>
+        public RelayCommand Pause
+        {
+            get
+            {
+                return _pause
+                    ?? (_pause = new RelayCommand(
+                                          () =>
+                                          {
+                                              ((Services.ILongRunning)_searchHelper).Pause();
+                                          },
+                                          () => ((Services.ILongRunning)_searchHelper).CanPause));
+            }
+        }
+        #endregion
+        #region Stop
+        private RelayCommand _stop;
+
+        /// <summary>
+        /// Gets the Stop.
+        /// </summary>
+        public RelayCommand Stop
+        {
+            get
+            {
+                return _stop
+                    ?? (_stop = new RelayCommand(
+                                          () =>
+                                          {
+                                              ((Services.ILongRunning)_searchHelper).Stop();
+                                          },
+                                          () => ((Services.ILongRunning)_searchHelper).CanStop));
+            }
+        }
+        #endregion
+        #region RootBrowse
+        private RelayCommand _rootBrowse;
+
+        /// <summary>
+        /// Gets the RootBrowse.
+        /// </summary>
+        public RelayCommand RootBrowse
+        {
+            get
+            {
+                return _rootBrowse
+                    ?? (_rootBrowse = new RelayCommand(
+                                          () =>
+                                          {
+                                              DirectoryInfo cf = null;
+
+                                              try
+                                              {
+                                                  cf = new DirectoryInfo(this.Root);
+                                              }
+                                              catch { }
+
+                                              var f = _fileService.AskUserForFolder(cf);
+
+                                              if (f != null)
+                                              {
+                                                  Root = f.FullName;
+                                              }
+
+                                          }));
+            }
+        }
+        #endregion
+
+        #endregion
 
         #region Messaging
 
-        private void doSearchStarted(Messages.SearchStarted searchStarted)
+        private void onSearchStarted(Messages.SearchStarted searchStarted)
         {
             GalaSoft.MvvmLight.Threading.DispatcherHelper.CheckBeginInvokeOnUI(() => { this.FoundItems.Clear(); });
 
         }
-        public void doThereIsProgress(Messages.ThereIsProgress thereIsProgress)
+        public void onThereIsProgress(Messages.ThereIsProgress thereIsProgress)
         {
             this.FoldersDiscovered = thereIsProgress.Content.FoldersDiscovered.ToString();
             this.FoldersSurveyed = thereIsProgress.Content.FoldersSurveyed.ToString();
@@ -1539,14 +1716,15 @@ namespace DumbSearch.ViewModel
 
         private System.Collections.Generic.IList<FileInfo> _matchedFileList = new System.Collections.Generic.List<FileInfo>();
 
-        public void doFileMatched(Messages.FileMatched fileMatched)
+        public void onFileMatched(Messages.FileMatched fileMatched)
         {
             GalaSoft.MvvmLight.Threading.DispatcherHelper.CheckBeginInvokeOnUI(() => { this.FoundItems.Add(fileMatched.Content.FullName); });
         }
 
-        private void doContentMatched(Messages.ContentMatched contentMatched)
+        private void onContentMatched(Messages.ContentMatched contentMatched)
         {
-            GalaSoft.MvvmLight.Threading.DispatcherHelper.CheckBeginInvokeOnUI(() => {
+            GalaSoft.MvvmLight.Threading.DispatcherHelper.CheckBeginInvokeOnUI(() =>
+            {
                 this.FoundItems.Add(
                     string.Format(
                         "{0} on line {1}"

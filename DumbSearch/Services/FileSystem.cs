@@ -12,7 +12,15 @@ namespace DumbSearch.Services
 
         FileInfo[] IFileSystem.GetFilesInFolder(DirectoryInfo folder)
         {
-            return folder.GetFiles();
+            try
+            {
+                return folder.GetFiles();
+            }
+            catch (Exception)
+            {
+                return new FileInfo[0];
+            }
+            
         }
 
         DirectoryInfo[] IFileSystem.GetSubFolders(DirectoryInfo folder)
@@ -23,6 +31,25 @@ namespace DumbSearch.Services
         StreamReader IFileSystem.OpenFileAsText(FileInfo file)
         {
             return file.OpenText();
+        }
+
+        DirectoryInfo IFileSystem.AskUserForFolder(DirectoryInfo currentFolder)
+        {
+            var di = currentFolder;
+
+            var fbd = new System.Windows.Forms.FolderBrowserDialog();
+
+            fbd.RootFolder = Environment.SpecialFolder.Desktop;
+
+            if (currentFolder != null)
+                fbd.SelectedPath = currentFolder.FullName;
+
+            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                di = new DirectoryInfo(fbd.SelectedPath);
+            }
+
+            return di;
         }
 
         #endregion

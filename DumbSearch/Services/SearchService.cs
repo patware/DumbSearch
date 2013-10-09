@@ -6,8 +6,9 @@ using System.IO;
 
 namespace DumbSearch.Services
 {
-    public sealed class SearchService : DumbSearch.Services.ISearchService
+    public sealed class SearchService : LongRunningBase, DumbSearch.Services.ISearchService
     {
+        #region Privates
         private readonly Services.IFileSystem _fileSystemService;
 
         private DirectoryInfo _root;
@@ -34,9 +35,10 @@ namespace DumbSearch.Services
             _fileSystemService = fileSystemService;
         }
 
-
         private void init(Model.SearchParameters parameters)
         {
+            base.Start();
+
             _parameters = parameters;
             _foundFiles = new List<FileInfo>();
             _progress = new Messages.CurrentProgress();
@@ -55,7 +57,7 @@ namespace DumbSearch.Services
             if (_folderNameIsFiltered)
             {
                 if (parameters.FolderIsRegex)
-                    _regexForMatchingFoldername = new System.Text.RegularExpressions.Regex(_parameters.Folder,regexOptions);
+                    _regexForMatchingFoldername = new System.Text.RegularExpressions.Regex(_parameters.Folder, regexOptions);
                 else
                 {
                     var pattern = getSearchPattern(_parameters.Folder);
@@ -79,7 +81,7 @@ namespace DumbSearch.Services
             if (parameters.ContentIsRegex)
                 _regexForMatchingFileContent = new System.Text.RegularExpressions.Regex(_parameters.Content);
 
-            _root = new DirectoryInfo(_parameters.Root);
+            _root = _parameters.Root;
         }
 
         private string getSearchPattern(string filename)
@@ -92,10 +94,13 @@ namespace DumbSearch.Services
 
         private void parseFolder(DirectoryInfo someFolder, bool folderIsMatched)
         {
+            if (base.LongRunningCancelled()) return;
             parseFilesInFolder(someFolder, folderIsMatched);
 
+            if (base.LongRunningCancelled()) return;
             parseSubFolders(someFolder, folderIsMatched);
 
+            if (base.LongRunningCancelled()) return;
             _progress.FoldersSurveyed++;
 
             GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<Messages.ThereIsProgress>(_progressMessage);
@@ -104,6 +109,8 @@ namespace DumbSearch.Services
 
         private void parseSubFolders(DirectoryInfo someFolder, bool folderIsMatched)
         {
+            if (base.LongRunningCancelled()) return;
+
             /* whether we filter or not folders, we need all of the sub folders -- it's for the count of folders */
             System.IO.DirectoryInfo[] subFolders = null;
             try
@@ -116,6 +123,8 @@ namespace DumbSearch.Services
 
             }
 
+            if (base.LongRunningCancelled()) return;
+
             if (subFolders != null)
             {
                 _progress.FoldersDiscovered += subFolders.Length;
@@ -124,7 +133,10 @@ namespace DumbSearch.Services
                 {
                     // we're matched, no need to check anything... just parse that subfolder.
                     foreach (var subFolder in subFolders)
+                    {
+                        if (base.LongRunningCancelled()) return;
                         parseFolder(subFolder, true);
+                    }
                 }
                 else
                 {
@@ -133,6 +145,7 @@ namespace DumbSearch.Services
 
                     foreach (var subFolder in subFolders)
                     {
+                        if (base.LongRunningCancelled()) return;
                         var subFolderMatched = filteredFolders.Contains(subFolder.Name);
                         parseFolder(subFolder, subFolderMatched);
                     }
@@ -147,6 +160,7 @@ namespace DumbSearch.Services
             /* Do we need to find files in this folder ?
              * Always: unless We're filtering on FolderNames and this folder doesn't not match the request
              */
+            if (base.LongRunningCancelled()) return;
 
             var weNeedToFindFilesInThisFolder = !_folderNameIsFiltered || folderIsMatched;
 
@@ -210,12 +224,16 @@ namespace DumbSearch.Services
         {
             foreach (var file in files)
             {
+                if (base.LongRunningCancelled()) return;
+
                 processFile(file);
             }
         }
 
         private void processFile(FileInfo file)
         {
+            if (base.LongRunningCancelled()) return;
+
             _progress.FilesMatched++;
 
             if (_fileContentIsFiltered)
@@ -242,6 +260,9 @@ namespace DumbSearch.Services
                     var line = string.Empty;
                     while (!sr.EndOfStream)
                     {
+
+                        if (base.LongRunningCancelled()) return;
+
                         line = sr.ReadLine();
                         lineNumber++;
                         int cent = (int)(100 * sr.BaseStream.Position / sr.BaseStream.Length);
@@ -271,7 +292,7 @@ namespace DumbSearch.Services
             }
 
         }
-
+        #endregion
 
         #region ISearchService Members
 
@@ -280,10 +301,14 @@ namespace DumbSearch.Services
             init(parameters);
 
             GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<Messages.SearchStarted>(new Messages.SearchStarted("Starting...  Can you here the gears?"));
+            //parseFolder(_root, false);
+
             parseFolder(_root, false);
 
         }
 
         #endregion
+
+
     }
 }

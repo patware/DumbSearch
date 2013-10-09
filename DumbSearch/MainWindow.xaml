@@ -39,8 +39,9 @@
 
                 <!-- Root -->
                 <StackPanel Orientation="Horizontal" Background="White" Margin="2">
-                    <TextBlock Text="Root:" Width="100"></TextBlock>
-                    <TextBox Text="{Binding Root, UpdateSourceTrigger=PropertyChanged}" Width="250"></TextBox>
+                    <TextBlock Text="Start at folder:" Width="100" VerticalAlignment="Center"></TextBlock>
+                    <TextBox Text="{Binding Root, UpdateSourceTrigger=PropertyChanged}" Width="250" VerticalAlignment="Center"></TextBox>
+                    <Button Margin="3" Padding="3" Width="25" Command="{Binding RootBrowse}">...</Button>
                 </StackPanel>
 
                 <!-- Folder -->
@@ -137,6 +138,8 @@
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button HorizontalAlignment="Center" Command="{Binding Search}" Padding="3" Margin="5" IsDefault="True">Search</Button>
+            <Button HorizontalAlignment="Center" Command="{Binding Pause}" Padding="3" Margin="5">Pause</Button>
+            <Button HorizontalAlignment="Center" Command="{Binding Stop}" Padding="3" Margin="5">Stop</Button>
             <TextBlock Text="{Binding Status}" MinWidth="200" VerticalAlignment="Center" Padding="5" Margin="5"></TextBlock>
         </StackPanel>
         

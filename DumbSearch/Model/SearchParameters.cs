@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -7,7 +8,7 @@ namespace DumbSearch.Model
 {
     public class SearchParameters
     {
-        public string Root { get; set; }
+        public DirectoryInfo Root { get; set; }
         public string Folder { get; set; }
         public bool FolderIsRegex { get; set; }
         public string FileName { get; set; }
