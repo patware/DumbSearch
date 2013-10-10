@@ -20,6 +20,11 @@ namespace DumbSearch.Services
             _currentStatus = ProcessStatus.Running;
             notifyStatusChanged();
         }
+        internal void Stop()
+        {
+            _currentStatus = ProcessStatus.Completed;
+            notifyStatusChanged();
+        }
 
         internal bool LongRunningCancelled()
         {
@@ -167,5 +172,6 @@ namespace DumbSearch.Services
             remove { ILongRunningStatusChangedEvent -= value; }
         }
         #endregion
+
     }
 }

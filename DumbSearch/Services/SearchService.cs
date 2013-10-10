@@ -37,7 +37,6 @@ namespace DumbSearch.Services
 
         private void init(Model.SearchParameters parameters)
         {
-            base.Start();
 
             _parameters = parameters;
             _foundFiles = new List<FileInfo>();
@@ -298,13 +297,26 @@ namespace DumbSearch.Services
 
         void ISearchService.Search(Model.SearchParameters parameters)
         {
-            init(parameters);
+            base.Start();
 
-            GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<Messages.SearchStarted>(new Messages.SearchStarted("Starting...  Can you here the gears?"));
-            //parseFolder(_root, false);
+            try
+            {
+                init(parameters);
 
-            parseFolder(_root, false);
+                GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<Messages.SearchStarted>(new Messages.SearchStarted("Starting...  Can you here the gears?"));
+                //parseFolder(_root, false);
 
+                parseFolder(_root, false);
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                base.Stop();
+            }
         }
 
         #endregion
