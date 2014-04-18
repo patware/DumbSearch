@@ -12,7 +12,7 @@ namespace DumbSearch.Console
         {
             System.Console.WriteLine("DumbSearch Command Line Utility");
 
-            var s = new DumbSearch.Service.Search();
+            var s = new DumbSearch.Service.Searcher();
 
             System.Console.WriteLine();
             System.Console.WriteLine("Press any key...");

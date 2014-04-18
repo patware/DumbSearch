@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace DumbSearch.Service
 {
-    public class Search
+    public interface IFoo
     {
-
+        bool DoSomething(string bar);
     }
 }
