@@ -1,7 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumbSearch", "DumbSearch\DumbSearch.csproj", "{AD448699-82BF-4093-A1AE-F6871E5E06F5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{C1153C6F-9637-4F3A-9D52-D59B83AD7976}"
+	ProjectSection(SolutionItems) = preProject
+		Lib\GalaSoft.MvvmLight.Extras.WPF4.dll = Lib\GalaSoft.MvvmLight.Extras.WPF4.dll
+		Lib\GalaSoft.MvvmLight.Extras.WPF4.pdb = Lib\GalaSoft.MvvmLight.Extras.WPF4.pdb
+		Lib\GalaSoft.MvvmLight.Extras.WPF4.xml = Lib\GalaSoft.MvvmLight.Extras.WPF4.xml
+		Lib\GalaSoft.MvvmLight.WPF4.dll = Lib\GalaSoft.MvvmLight.WPF4.dll
+		Lib\GalaSoft.MvvmLight.WPF4.pdb = Lib\GalaSoft.MvvmLight.WPF4.pdb
+		Lib\GalaSoft.MvvmLight.WPF4.xml = Lib\GalaSoft.MvvmLight.WPF4.xml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
