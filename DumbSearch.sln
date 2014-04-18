@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumbSearch.Service", "DumbS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumbSearch.Console", "DumbSearch.Console\DumbSearch.Console.csproj", "{CFE7ACF9-2C69-4464-84CB-D7257EE51FE5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumbSearch.Service.Tests", "DumbSearch.Service.Tests\DumbSearch.Service.Tests.csproj", "{57677B43-A3D9-4C14-9195-585124611C72}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{CFE7ACF9-2C69-4464-84CB-D7257EE51FE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFE7ACF9-2C69-4464-84CB-D7257EE51FE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFE7ACF9-2C69-4464-84CB-D7257EE51FE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57677B43-A3D9-4C14-9195-585124611C72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57677B43-A3D9-4C14-9195-585124611C72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57677B43-A3D9-4C14-9195-585124611C72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57677B43-A3D9-4C14-9195-585124611C72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

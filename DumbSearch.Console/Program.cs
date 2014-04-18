@@ -10,6 +10,13 @@ namespace DumbSearch.Console
     {
         static void Main(string[] args)
         {
+            System.Console.WriteLine("DumbSearch Command Line Utility");
+
+            var s = new DumbSearch.Service.Search();
+
+            System.Console.WriteLine();
+            System.Console.WriteLine("Press any key...");
+            System.Console.ReadKey();
         }
     }
 }
